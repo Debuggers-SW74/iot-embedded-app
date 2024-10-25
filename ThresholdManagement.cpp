@@ -8,7 +8,7 @@ ThresholdManagement::ThresholdManagement(StateManagement* stateManager)
 }
 
 bool ThresholdManagement::updateThresholds(const ThresholdState& thresholds) {
-
+  return stateManager->updateThresholds(thresholds);
 }
 
 bool ThresholdManagement::updateTemperatureThreshold(float max) {
