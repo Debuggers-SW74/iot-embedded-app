@@ -12,7 +12,9 @@ bool ThresholdManagement::updateThresholds(const ThresholdState& thresholds) {
 }
 
 bool ThresholdManagement::updateTemperatureThreshold(float max) {
-
+  ThresholdState thresholds = stateManager->getThresholds();
+  thresholds.temperatureMax = max;
+  return stateManager->updateThresholds(thresholds);
 }
 
 bool ThresholdManagement::updateHumidityThreshold(float max) {
