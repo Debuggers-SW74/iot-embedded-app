@@ -26,5 +26,5 @@ bool ThresholdManagement::updatePressureThreshold(float max) {
 }
 
 const ThresholdState& ThresholdManagement::getThresholds() const {
-
+  return stateManager->getThresholds();
 }
