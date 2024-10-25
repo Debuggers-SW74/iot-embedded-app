@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "author": "Debuggers Team",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "chip-bme280", "id": "bme280", "top": 20.22, "left": -185.39, "attrs": {} },
+    { "type": "chip-mq2", "id": "mq2", "top": 20.22, "left": 168, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:TX0", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX0", "$serialMonitor:TX", "", [] ],
+    [ "bme280:VCC", "esp:VIN", "red", [ "h19.2", "v105.6" ] ],
+    [ "bme280:GND", "esp:GND.2", "black", [ "h28.8", "v105.7" ] ],
+    [ "bme280:SCL", "esp:D26", "green", [ "h48", "v67.3" ] ],
+    [ "bme280:SDA", "esp:D27", "blue", [ "h38.4", "v86.7" ] ]
+  ],
+  "dependencies": {}
+}
