@@ -16,7 +16,9 @@ bool ThresholdManagement::updateTemperatureThreshold(float max) {
 }
 
 bool ThresholdManagement::updateHumidityThreshold(float max) {
-
+  ThresholdState thresholds = stateManager->getThresholds();
+  thresholds.humidityMax = max;
+  return stateManager->updateThresholds(thresholds);
 }
 
 bool ThresholdManagement::updatePressureThreshold(float max) {
