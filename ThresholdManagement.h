@@ -12,6 +12,11 @@ private:
 public:
     explicit ThresholdManagement(StateManagement* stateManager);
 
+    // Threshold Configuration
+    bool updateThresholds(const ThresholdState& thresholds); 
+    bool updateTemperatureThreshold(float max);
+    bool updateHumidityThreshold(float max);
+    bool updatePressureThreshold(float max);
 
     // Threshold Queries
     const ThresholdState& getThresholds() const;
