@@ -15,5 +15,13 @@ SensorDriver::SensorDriver() {
 }
 
 SensorState SensorDriver::collectData() {
-
+  bme.takeForcedMeasurement();
+    
+  SensorState state;
+  state.temperature = bme.readTemperature();
+  state.humidity = bme.readHumidity();
+  state.pressure = bme.readPressure() / 100.0F;
+  state.altitude = bme.readAltitude(1013.25F);
+    
+  return state;
 }
