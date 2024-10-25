@@ -81,7 +81,31 @@ String CommunicationManager::healthStatusToString(HealthStatus status) {
 }
 
 void CommunicationManager::sendHealth() {
+	if (!isConnected()) {
+        Serial.println("Not connected to WiFi. Cannot send health status.");
+        return;
+    }
 
+    Serial.println("Preparing to send health status...");
+    httpClient.begin(edgeApiUrl);
+
+    DynamicJsonDocument json(256);
+    json["health"] = healthStatusToString(stateManager->getHealthStatus());
+
+    String jsonString;
+    serializeJson(json, jsonString);
+
+    httpClient.addHeader("Content-Type", "application/json");
+    int httpResponseCode = httpClient.POST(jsonString);
+
+    if (httpResponseCode > 0) {
+        Serial.println("Node health sent successfully. HTTP Response code: " + String(httpResponseCode));
+    } else {
+        Serial.println("Error sending node health. HTTP Response code: " + String(httpResponseCode));
+    }
+
+    httpClient.end();
+	
 }
 
 bool CommunicationManager::publishEvent(const String& eventType, const String& sensorType) {
