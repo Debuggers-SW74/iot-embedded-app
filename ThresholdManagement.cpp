@@ -22,7 +22,9 @@ bool ThresholdManagement::updateHumidityThreshold(float max) {
 }
 
 bool ThresholdManagement::updatePressureThreshold(float max) {
-
+  ThresholdState thresholds = stateManager->getThresholds();
+  thresholds.pressureMax = max;
+  return stateManager->updateThresholds(thresholds);
 }
 
 const ThresholdState& ThresholdManagement::getThresholds() const {
