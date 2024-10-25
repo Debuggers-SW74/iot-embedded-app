@@ -7,7 +7,29 @@ CommunicationManager::CommunicationManager(StateManagement* stateManager)
     : stateManager(stateManager), connected(false) { }
 
 bool CommunicationManager::connectWiFi() {
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
+    Serial.print("Connecting to WiFi...");
+
+    int retries = 20;
+    while (WiFi.status() != WL_CONNECTED && retries > 0) {
+        delay(500);
+        Serial.print(".");
+        retries--;
+    }
+
+    connected = (WiFi.status() == WL_CONNECTED);
+
+    if (connected) {
+        Serial.println(" Connected!");
+        Serial.print("IP address: ");
+        Serial.println(WiFi.localIP());
+        return true;
+    } else {
+        Serial.println("Failed to connect to WiFi.");
+        return false;
+    }
 }
 
 void CommunicationManager::sendState() {
