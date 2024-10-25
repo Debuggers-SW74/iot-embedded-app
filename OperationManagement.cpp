@@ -3,7 +3,16 @@
 
 #include "OperationManagement.h"
 
-OperationManagement::OperationManagement() {
+OperationManagement::OperationManagement(
+    StateManagement* stateManager, 
+    ThresholdManagement* thresholdManager,
+    SensorDriver* sensorDriver,
+    CommunicationManager* communicationManager)
+    : stateManager(stateManager)
+    , thresholdManager(thresholdManager)
+    , sensorDriver(sensorDriver)
+    , communicationManager(communicationManager)
+    , lastOperationTime(0) {
 }
 
 void OperationManagement::executeOperationCycle() {
@@ -25,5 +34,10 @@ void OperationManagement::scheduleOperations() {
   }
 }
 bool OperationManagement::shouldSendData() {
-
+  const SensorState& currentState = stateManager->getSensorState();
+  const ThresholdState& thresholds = thresholdManager->getThresholds();
+    
+  return (currentState.temperature > thresholds.temperatureMax ||
+    currentState.humidity > thresholds.humidityMax ||
+    currentState.pressure > thresholds.pressureMax);
 }
