@@ -109,5 +109,31 @@ void CommunicationManager::sendHealth() {
 }
 
 bool CommunicationManager::publishEvent(const String& eventType, const String& sensorType) {
-	
+    if (!isConnected()) {
+        Serial.println("Not connected to WiFi. Cannot publish event.");
+        return false;
+    }
+
+    DynamicJsonDocument json(512);
+    json["eventType"] = eventType;
+    json["sensorType"] = sensorType;
+    json["timestamp"] = millis();
+
+    String jsonString;
+    serializeJson(json, jsonString);
+
+    httpClient.begin(edgeApiUrl + "/events"); // Por ahora se asume un Endpoint ficticio de Events.
+    httpClient.addHeader("Content-Type", "application/json");
+    
+    int httpResponseCode = httpClient.POST(jsonString);
+    bool success = (httpResponseCode > 0);
+
+    if (success) {
+        Serial.println("Event published successfully");
+    } else {
+        Serial.println("Failed to publish event");
+    }
+
+    httpClient.end();
+    return success;
 }
