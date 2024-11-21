@@ -1,35 +1,46 @@
-/*OPERATION LAYER: Operation Management*/
+/* OPERATION LAYER: Operation Management */
 
 #ifndef OPERATION_MANAGEMENT_H
 #define OPERATION_MANAGEMENT_H
 
-#include "StateManagement.h"
-#include "ThresholdManagement.h"
-#include "CommunicationManager.h"
 #include "SensorDriver.h"
+#include "CommunicationManager.h" 
+#include "StateManagement.h"
+#include "HandlersManagement.h"
+#include "ThresholdManagement.h"
+#include "RequestManager.h"
+#include "ActuatorDriver.h"
+#include <Arduino.h>
 
 class OperationManagement {
 private:
-    StateManagement* stateManager;
-    ThresholdManagement* thresholdManager;
-    CommunicationManager* communicationManager;
-    SensorDriver* sensorDriver;
+  SensorDriver* sensorDriver;
+  CommunicationManager* communicationManager;
+  StateManagement* stateManager;
+  HandlersManagement* handlersManagement;
+  RequestManager* requestManager;
+  ThresholdManagement* thresholdManagement;
+  ActuatorDriver* actuatorDriver;
     
-    unsigned long lastOperationTime;
-    static const unsigned long OPERATION_INTERVAL = 10000; // 10 segundos
-    
-    bool shouldSendData();
+  unsigned long lastExecutionTime;
+  //const unsigned long interval = 5000; // 5 segundos para la recolección de datos
+  const unsigned long interval = 2000;
+
+  //Operation Engine
+  void operationEngine();
 
 public:
-    OperationManagement(
-      StateManagement* stateManager, 
-      ThresholdManagement* thresholdManager,
-      SensorDriver* sensorDriver,
-      CommunicationManager* communicationManager
-    );
+  explicit OperationManagement(
+    SensorDriver* sensorDriver, 
+    CommunicationManager* commManager,
+    StateManagement* stateManager,
+    HandlersManagement* handlersManagement,
+    RequestManager* requestManager,
+    ThresholdManagement* thresholdManagement,
+    ActuatorDriver* actuatorDriver
+  );
 
-    void executeOperationCycle();
-    void scheduleOperations();
+  void run();
 };
 
-#endif
+#endif // OPERATION_MANAGEMENT_H

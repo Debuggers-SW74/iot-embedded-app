@@ -1,8 +1,8 @@
-/*INTERFACE LAYER: Request Manager*/
+/* INTERFACE LAYER: Request Manager */
 
 #include "RequestManager.h"
 
-RequestManager::RequestManager(StateManagement* stateManager) 
+RequestManager::RequestManager(StateManagement* stateManager)
   : stateManager(stateManager) { }
 
 SensorState RequestManager::getState() const {
@@ -10,7 +10,6 @@ SensorState RequestManager::getState() const {
 }
 
 bool RequestManager::updateState(const SensorState& newState) {
-  //TO DO: El sensor BME280 lee datos, pero se podría actualizar algún dato manualmente 
   return stateManager->updateSensorState(newState);
 }
 
@@ -19,5 +18,5 @@ bool RequestManager::updateThresholds(const ThresholdState& newThresholds) {
 }
 
 HealthStatus RequestManager::getHealth() const {
-  return stateManager-> getHealthStatus();
+  return stateManager->getHealthStatus();
 }

@@ -3,17 +3,60 @@
   "author": "Debuggers Team",
   "editor": "wokwi",
   "parts": [
-    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
-    { "type": "chip-bme280", "id": "bme280", "top": 20.22, "left": -185.39, "attrs": {} },
-    { "type": "chip-mq2", "id": "mq2", "top": 20.22, "left": 168, "attrs": {} }
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": -62.5, "left": 23.8, "attrs": {} },
+    { "type": "chip-bme280", "id": "bme280", "top": -37.38, "left": 196.8, "attrs": {} },
+    { "type": "chip-mq2", "id": "mq2", "top": -46.98, "left": -146.99, "attrs": {} },
+    {
+      "type": "wokwi-buzzer",
+      "id": "bz1",
+      "top": 31.2,
+      "left": -142.2,
+      "attrs": { "volume": "0.1" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": 34.8,
+      "left": 234.2,
+      "attrs": { "color": "limegreen" }
+    },
+    { "type": "wokwi-led", "id": "led2", "top": 34.8, "left": 301.4, "attrs": { "color": "red" } },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 120,
+      "left": 297.05,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r2",
+      "top": 120,
+      "left": 229.85,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    }
   ],
   "connections": [
     [ "esp:TX0", "$serialMonitor:RX", "", [] ],
     [ "esp:RX0", "$serialMonitor:TX", "", [] ],
-    [ "bme280:VCC", "esp:VIN", "red", [ "h19.2", "v105.6" ] ],
-    [ "bme280:GND", "esp:GND.2", "black", [ "h28.8", "v105.7" ] ],
-    [ "bme280:SCL", "esp:D26", "green", [ "h48", "v67.3" ] ],
-    [ "bme280:SDA", "esp:D27", "blue", [ "h38.4", "v86.7" ] ]
+    [ "bme280:VCC", "esp:3V3", "red", [ "h-19.2", "v124.8" ] ],
+    [ "bme280:GND", "esp:GND.2", "black", [ "h-38.4", "v172.8", "h-153.6", "v-67.1" ] ],
+    [ "bme280:SCL", "esp:D22", "blue", [ "h-28.8", "v-18.9" ] ],
+    [ "bme280:SDA", "esp:D21", "limegreen", [ "h0" ] ],
+    [ "mq2:D0", "esp:D23", "blue", [ "h9.6", "v-48", "h192", "v38.3" ] ],
+    [ "mq2:VCC", "esp:VIN", "red", [ "h19.2", "v105.6" ] ],
+    [ "mq2:GND", "esp:GND.1", "black", [ "h28.8", "v182.4", "h153.6", "v-76.7" ] ],
+    [ "mq2:A0", "esp:D34", "limegreen", [ "h48", "v29" ] ],
+    [ "led1:A", "r2:1", "#8f4814", [ "v0", "v19.2" ] ],
+    [ "led2:A", "r1:1", "#8f4814", [ "h38.4", "v-96" ] ],
+    [ "led1:C", "esp:GND.1", "white", [ "h-28.4", "v0.1" ] ],
+    [ "led2:C", "esp:GND.1", "white", [ "h-86", "v9.7" ] ],
+    [ "r2:2", "esp:D4", "#8f4814", [ "v8.4", "h-48", "v-115.3" ] ],
+    [ "r1:2", "esp:D2", "#8f4814", [ "v8.4", "h-105.6", "v-95.3" ] ],
+    [ "bz1:2", "esp:D26", "orange", [ "v19.2", "h66.8", "v-95.9" ] ],
+    [ "bz1:1", "esp:GND.2", "white", [ "v28.8", "h86.4", "v-57.5" ] ]
   ],
   "dependencies": {}
 }
