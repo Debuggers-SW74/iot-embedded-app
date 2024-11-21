@@ -16,11 +16,11 @@ The project shows how the IoT sensor could be able to reduce the risk of acciden
 
 ## External Services
 The application communicates with a RESTful API to send and receive sensor data. The API endpoint for this project is hosted at:
-- **EDGE NODE API Endpoint**: [https://fastporte-edge-api.azurewebsites.net/swagger-ui/index.html#]
+- **EDGE NODE API Endpoint**: https://fastporte-edge-api.azurewebsites.net/swagger-ui/index.html#
 
 ## Wokwi Custom Chips
 This project utilizes Wokwi custom chips for simulating the MQ2 and BME280 sensors. You can find the public link to the Wokwi simulator here:
-- [Wokwi Simulator Project](https://wokwi.com/projects/414946193954143233)
+- Wokwi Simulator Project: https://wokwi.com/projects/414946193954143233
 
 ## Features
 - **MQ2 Gas Detection**: Reads gas concentration levels and determines safety status.
