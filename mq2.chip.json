@@ -2,13 +2,14 @@
   "name": "mq2",
   "author": "Debbugers Team",
   "pins": [
+    "",
+    "",
+    "",
+    "",
     "VCC",
     "GND",
     "D0",
-    "A0", 
-    "",
-    "",
-    ""
+    "A0"
   ],
   "controls": [
     {

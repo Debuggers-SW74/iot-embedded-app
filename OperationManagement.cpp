@@ -1,43 +1,145 @@
-/*OPERATION LAYER: Operation Management*/
-
-
 #include "OperationManagement.h"
 
 OperationManagement::OperationManagement(
-    StateManagement* stateManager, 
-    ThresholdManagement* thresholdManager,
-    SensorDriver* sensorDriver,
-    CommunicationManager* communicationManager)
-    : stateManager(stateManager)
-    , thresholdManager(thresholdManager)
-    , sensorDriver(sensorDriver)
-    , communicationManager(communicationManager)
-    , lastOperationTime(0) {
-}
+  SensorDriver* sensorDriver, 
+  CommunicationManager* commManager,
+  StateManagement* stateManager,
+  HandlersManagement* handlersManagement,
+  RequestManager* requestManager,
+  ThresholdManagement* thresholdManagement,
+  ActuatorDriver* actuatorDriver
+)
+  : sensorDriver(sensorDriver), 
+    communicationManager(commManager), 
+    stateManager(stateManager), 
+    handlersManagement(handlersManagement),
+    requestManager(requestManager),
+    thresholdManagement(thresholdManagement),
+    actuatorDriver(actuatorDriver),
+    lastExecutionTime(0) { }
 
-void OperationManagement::executeOperationCycle() {
-  SensorState newState = sensorDriver->collectData();
-    
-  if (stateManager->updateSensorState(newState)) {
-    if (shouldSendData()) {
-      communicationManager->sendState();
-      lastOperationTime = millis();
+
+void OperationManagement::operationEngine() {
+  sensorDriver->collectData();      //BME280
+  sensorDriver->gasCollectData();   //MQ2
+
+  SensorState currentState = {
+    .temperature = sensorDriver->getTemperature(),
+    .humidity = sensorDriver->getHumidity(),
+    .pressure = sensorDriver->getPressure(),
+    .gas = sensorDriver->getGasValue()
+  };
+
+  if (communicationManager->isConnected()) {
+    requestManager->updateState(currentState);
+    communicationManager->sendState();
+    communicationManager->sendHealth();
+
+    if (millis() - lastExecutionTime >= 520) { 
+
+      Serial.println("Enviando datos al servidor...");
+      if (communicationManager->sendRealTimeData()) {
+        Serial.println("Datos enviados correctamente.");
+      } else {
+        Serial.println("Error al enviar los datos.");
+      }
+
+      lastExecutionTime = millis(); // Reiniciar el temporizador
     }
   }
-}
-
-void OperationManagement::scheduleOperations() {
-  unsigned long currentTime = millis();
-    
-  if (currentTime - lastOperationTime >= OPERATION_INTERVAL) {
-    executeOperationCycle();
+  else {
+    Serial.println("Retrying to connect to Wifi...");
+    communicationManager->connectWiFi();
+    Serial.println("-------------------------------");
   }
-}
-bool OperationManagement::shouldSendData() {
-  const SensorState& currentState = stateManager->getSensorState();
-  const ThresholdState& thresholds = thresholdManager->getThresholds();
-    
-  return (currentState.temperature > thresholds.temperatureMax ||
-    currentState.humidity > thresholds.humidityMax ||
-    currentState.pressure > thresholds.pressureMax);
+
+  if (communicationManager->checkNewThresholds()) {
+    ThresholdState newThresholds = communicationManager->getNewThresholds();
+    if (thresholdManagement->updateThresholds(newThresholds)) {
+      Serial.println("Thresholds updated successfully.");
+    } else {
+      Serial.println("Failed to update thresholds.");
+    }
+  }
+
+
+  /*check thresholds and launch events*/
+  /*----------------------------------*/
+
+  const SensorState& currentStateFromStateManager = stateManager->getSensorState();
+  ThresholdState currentThresholds = stateManager->getThresholds();
+  bool thresholdExceeded = false;
+
+  if (currentStateFromStateManager.temperature > currentThresholds.temperatureMax) {
+    ThresholdExceededEvent event = {
+      .sensorType = "SENSOR_TEMPERATURE",
+      .currentValue = currentStateFromStateManager.temperature,
+      .thresholdValue = currentThresholds.temperatureMax,
+      .timestamp = millis()
+    };
+    handlersManagement->handleThresholdExceeded(event);
+    thresholdExceeded = true;
+  }
+
+  if (currentStateFromStateManager.humidity > currentThresholds.humidityMax) {
+    ThresholdExceededEvent event = {
+      .sensorType = "SENSOR_HUMIDITY",
+      .currentValue = currentStateFromStateManager.humidity,
+      .thresholdValue = currentThresholds.humidityMax,
+      .timestamp = millis()
+    };
+    handlersManagement->handleThresholdExceeded(event);
+    thresholdExceeded = true;
+  }
+
+  if (currentStateFromStateManager.pressure > currentThresholds.pressureMax) {
+    ThresholdExceededEvent event = {
+      .sensorType = "SENSOR_PRESSURE",
+      .currentValue = currentStateFromStateManager.pressure,
+      .thresholdValue = currentThresholds.pressureMax,
+      .timestamp = millis()
+    };
+    handlersManagement->handleThresholdExceeded(event);
+    thresholdExceeded = true;
+  }
+
+  if (currentStateFromStateManager.gas > currentThresholds.gasMax) {
+    ThresholdExceededEvent event = {
+      .sensorType = "SENSOR_GAS",
+      .currentValue = currentStateFromStateManager.gas,
+      .thresholdValue = currentThresholds.gasMax,
+      .timestamp = millis()
+    };
+    handlersManagement->handleThresholdExceeded(event);
+    thresholdExceeded = true;
+  }
+
+
+
+  /*Control of LEDs and buzzer using ActuatorDriver*/
+  /*----------------------------------*/
+  if (thresholdExceeded) {
+    actuatorDriver->turnOffGreenLed();  // Turn off the green LED
+    actuatorDriver->turnOnRedLed();     // Turn on the red LED
+    //actuatorDriver->activateBuzzer();   // Activate the buzzer
+  } else {
+    actuatorDriver->turnOnGreenLed();   // Turn on the green LED
+    actuatorDriver->turnOffRedLed();    // Turn off the red LED
+    actuatorDriver->deactivateBuzzer(); // Deactivate the buzzer
+  }
+} 
+
+void OperationManagement::run() {
+  while (true) {
+    unsigned long currentMillis = millis();
+        
+    if (currentMillis - lastExecutionTime >= interval) { //Get the data in intervals
+      lastExecutionTime = currentMillis;
+      operationEngine();
+    }
+    //delay(10);
+    if (millis() % 10 == 0) {
+      yield(); // Cede el control a otros procesos
+    }
+  }
 }

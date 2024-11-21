@@ -1,42 +1,65 @@
-/*STATE LAYER: State Management*/
+/* STATE LAYER: State Management */
 
 #include "StateManagement.h"
 
-StateManagement* StateManagement::instance = nullptr;
+bool StateManagement::validateSensorState(const SensorState& state) const {
+  return (state.temperature >= 0.0f && state.temperature <= 85.0f) &&
+         (state.humidity >= 0.0f && state.humidity <= 100.0f) &&
+         (state.pressure >= 3.0f && state.pressure <= 255.0f) &&
+         (state.gas >= 0.0f && state.gas <= 100.0f);
+}
 
-StateManagement* StateManagement::getInstance() {
-  if (!instance) {
-    instance = new StateManagement();
+bool StateManagement::validateThresholds(const ThresholdState& thresholds) const {
+  return (thresholds.temperatureMax > 0.0f && thresholds.temperatureMax <= 85.0f) &&
+         (thresholds.humidityMax > 0.0f && thresholds.humidityMax <= 100.0f) &&
+         (thresholds.pressureMax > 3.0f && thresholds.pressureMax <= 255.0f) &&
+         (thresholds.gasMax > 0.0f && thresholds.gasMax <= 100.0f);
+}
+
+HealthStatus StateManagement::calculateHealthStatus(const SensorState& state, const ThresholdState& thresholds) const {
+  if (
+      state.temperature > thresholds.temperatureMax ||
+      state.humidity > thresholds.humidityMax ||
+      state.pressure > thresholds.pressureMax ||
+      state.gas      > thresholds.gasMax
+    ) {
+    return HealthStatus::WARNING;
   }
-  return instance;
+  return HealthStatus::HEALTHY;
 }
 
+/*[State Actions]*/
+/*--------------------*/
 bool StateManagement::updateSensorState(const SensorState& newState) {
-    store.sensorState = newState;
-    
-    // Actualizar el estado de salud o HealthStatus basado con los Thresholds
-    store.healthStatus = 
-        (newState.temperature > store.thresholdState.temperatureMax ||
-         newState.humidity > store.thresholdState.humidityMax ||
-         newState.pressure > store.thresholdState.pressureMax) 
-        ? HealthStatus::WARNING : HealthStatus::HEALTHY;
-        
-    return true;
-}
+  if (!validateSensorState(newState)) {
+    Serial.println("Invalid sensor state.");
+    return false;
+  }
 
-bool StateManagement::updateThresholds(const ThresholdState& newThresholds) {
-  store.thresholdState = newThresholds;
+  store.sensorState = newState;
+  store.healthStatus = calculateHealthStatus(newState, store.thresholdState);
+  Serial.println("Update Sensor State: True");
+  Serial.println("-------------------------------");
   return true;
 }
 
-const SensorState& StateManagement::getSensorState() const {
-  return store.sensorState;
+bool StateManagement::updateThresholds(const ThresholdState& newThresholds) {
+  if (!validateThresholds(newThresholds)) {
+    Serial.println("Invalid thresholds.");
+    return false;
+  }
+
+  store.thresholdState = newThresholds;
+  store.healthStatus = calculateHealthStatus(store.sensorState, newThresholds);
+  Serial.println("Thresholds updated.");
+  return true;
 }
 
-const ThresholdState& StateManagement::getThresholds() const {
-  return store.thresholdState;
-}
+void StateManagement::updateHealth(HealthStatus newStatus) { store.healthStatus = newStatus; }
 
-HealthStatus StateManagement::getHealthStatus() const {
-  return store.healthStatus;
-}
+
+/*[State Queries]*/
+/*--------------------*/
+const SensorState& StateManagement::getSensorState() const { return store.sensorState; }
+const ThresholdState& StateManagement::getThresholds() const { return store.thresholdState; }
+HealthStatus StateManagement::getHealthStatus() const { return store.healthStatus; }

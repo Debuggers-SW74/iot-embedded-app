@@ -2,70 +2,70 @@
   "name": "bme280",
   "author": "Debbugers Team",
   "pins": [
-    "",
-    "",
-    "",
-    "",
     "VCC",
     "GND",
     "SCL",
-    "SDA"
+    "SDA",
+    "",
+    "",
+    "",
+    ""
   ],
   "controls": [
     {
       "id": "temperature",
       "label": "Temperature (°C)",
       "type": "range", 
-      "min": -40, 
-      "max": 85, 
+      "min": 0, 
+      "max": 85.0, 
       "step": 1
     },
     {
       "id": "temperatureThreshold",
       "label": "Temperature Threshold (°C)",
       "type": "range",
-      "min": -40,
-      "max": 85,
+      "min": 0,
+      "max": 85.0,
       "step": 1
     },
     {
       "id": "humidity",
       "label": "Humidity (%)",
       "type": "range",
-      "min": 0,
-      "max": 100,
+      "min": 0.0,
+      "max": 100.0,
       "step": 1
     },
     {
       "id": "humidityThreshold",
       "label": "Humidity Threshold (%)",
       "type": "range",
-      "min": 0,
-      "max": 100,
+      "min": 0.0,
+      "max": 100.0,
       "step": 1
     },
     {
       "id": "pressure",
       "label": "Pressure (hPa)",
       "type": "range",
-      "min": 3,
-      "max": 1100,
+      "min": 3.0,
+      "max": 255.0,
       "step": 1
     },
     {
       "id": "pressureThreshold",
       "label": "Pressure Threshold (hPa)",
       "type": "range",
-      "min": 3,
-      "max": 1100,
+      "min": 3.0,
+      "max": 255.0,
       "step": 1
     },
     {
       "id": "altitude",
       "label": "Altitude (m)",
       "type": "range",
-      "min": 0,
-      "max": 9144,
+      "min": 0.0,
+      "max": 255.0,
       "step": 1
     }
   ]

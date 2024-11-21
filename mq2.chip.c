@@ -33,7 +33,7 @@ void chip_init() {
 
   // Setup Chip Attributes
   chip->gas_attr        = attr_init("gas",        10);
-  chip->threshold_attr  = attr_init("threshold",  50);
+  chip->threshold_attr  = attr_init("threshold",  40);
 
   // Setup Timer Event
   const timer_config_t timer_config = {
